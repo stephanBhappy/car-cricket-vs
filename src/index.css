@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #cdff60;
+  --color-primary-container: #b6f318;
+  --color-on-primary: #0c0c1f;
+  --color-on-primary-container: #0c0c1f;
+  --color-secondary: #ff8b66;
+  --color-secondary-dim: #ff8b66;
+  --color-on-secondary: #0c0c1f;
+  --color-tertiary: #b399ff;
+  --color-on-tertiary: #0c0c1f;
+  --color-background: #0c0c1f;
+  --color-on-background: #e5e3ff;
+  --color-surface: #0c0c1f;
+  --color-surface-container-lowest: #000000;
+  --color-surface-container-low: #111127;
+  --color-surface-container-high: #1d1d37;
+  --color-surface-container-highest: #23233f;
+  --color-surface-bright: #292948;
+  --color-on-surface: #e5e3ff;
+  --color-on-surface-variant: #aaa8c3;
+  --color-outline-variant: #46465c;
+
+  --font-headline: "Epilogue", sans-serif;
+  --font-body: "Lexend", sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-on-surface font-body;
+  }
+}
+
+.text-glow {
+  text-shadow: 0 0 20px rgba(205, 255, 96, 0.4);
+}
+
+.text-glow-secondary {
+  text-shadow: 0 0 30px rgba(255, 115, 72, 0.5);
+}
+
+.glass-panel {
+  background: rgba(41, 41, 72, 0.6);
+  backdrop-filter: blur(24px);
+}
+
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+.animate-marquee {
+  display: inline-flex;
+  animation: marquee 20s linear infinite;
+}
