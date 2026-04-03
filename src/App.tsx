@@ -19,7 +19,7 @@ import { Ticker, BottomNav, IconMap } from './components/Common';
 export default function App() {
   const [screen, setScreen] = useState<Screen>('home');
   const [gameState, setGameState] = useState<GameState>({
-    players: [{ id: '1', name: 'PLAYER 1', runs: 0, ballsFaced: 0, isOut: false }],
+    players: [{ id: '1', name: 'PLAYER 1', runs: 0, totalRuns: 0, ballsFaced: 0, totalBallsFaced: 0, isOut: false }],
     currentBatterIndex: 0,
     totalInnings: 2,
     currentInning: 1,
@@ -28,7 +28,7 @@ export default function App() {
 
   const [showCustomInnings, setShowCustomInnings] = useState(false);
 
-  const currentBatter = gameState.players[gameState.currentBatterIndex];
+  const currentBatter = gameState.players[gameState.currentBatterIndex] ?? gameState.players[0];
 
   const handleNavigate = (newScreen: Screen) => {
     setScreen(newScreen);
@@ -45,7 +45,9 @@ export default function App() {
       id: String(i + 1),
       name: gameState.players[i]?.name || `PLAYER ${i + 1}`,
       runs: 0,
+      totalRuns: 0,
       ballsFaced: 0,
+      totalBallsFaced: 0,
       isOut: false
     }));
     setGameState({ ...gameState, players: newPlayers });
@@ -60,13 +62,14 @@ export default function App() {
 
     if (rule.isOut) {
       batter.isOut = true;
+      batter.ballsFaced += 1;
       batter.dismissalType = 'Caught (Red Car)';
       newPlayers[gameState.currentBatterIndex] = batter;
       setGameState({ ...gameState, players: newPlayers });
       setScreen('out');
     } else {
       batter.runs += rule.runs;
-      batter.ballsFaced += 1;
+      if (!rule.noBall) batter.ballsFaced += 1;
       newPlayers[gameState.currentBatterIndex] = batter;
       setGameState({ 
         ...gameState, 
@@ -86,19 +89,22 @@ export default function App() {
     } else {
       // End of current inning
       if (gameState.currentInning < gameState.totalInnings) {
-        // Start next inning, reset all players
+        // Start next inning, accumulate runs then reset per-inning stats
         const resetPlayers = gameState.players.map(p => ({
           ...p,
+          totalRuns: p.totalRuns + p.runs,
+          totalBallsFaced: p.totalBallsFaced + p.ballsFaced,
           runs: 0,
           ballsFaced: 0,
           isOut: false,
           dismissalType: undefined
         }));
-        setGameState({ 
-          ...gameState, 
+        setGameState({
+          ...gameState,
           players: resetPlayers,
           currentBatterIndex: 0,
-          currentInning: gameState.currentInning + 1 
+          currentInning: gameState.currentInning + 1,
+          history: []
         });
         setScreen('next-batter');
       } else {
@@ -112,7 +118,9 @@ export default function App() {
     const resetPlayers = gameState.players.map(p => ({
       ...p,
       runs: 0,
+      totalRuns: 0,
       ballsFaced: 0,
+      totalBallsFaced: 0,
       isOut: false,
       dismissalType: undefined
     }));
@@ -138,14 +146,14 @@ export default function App() {
           )}
           <div className="w-8 h-8 rounded-full bg-surface-container-high border border-primary/20 overflow-hidden">
             <img 
-              src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${currentBatter?.name || 'player'}`} 
+              src={`https://api.dicebear.com/7.x/bottts/svg?seed=${currentBatter?.name || 'player'}`} 
               alt="Profile" 
               className="w-full h-full object-cover"
             />
           </div>
         </div>
         <h1 className="font-headline tracking-tighter uppercase font-black text-2xl italic text-primary truncate max-w-[180px] sm:max-w-[300px]">
-          {screen === 'game' ? currentBatter?.name : 'CAR CRICKET'}
+          {screen === 'game' ? currentBatter?.name : 'TARMAC TWENTY20'}
         </h1>
         <div className="w-10" />
       </header>
@@ -170,20 +178,17 @@ export default function App() {
 
             <div className="relative z-10 w-full max-w-md flex flex-col items-center">
               <div className="w-full bg-surface-container-lowest/40 backdrop-blur-md rounded-full py-2 px-6 mb-12 border border-outline-variant/10">
-                <div className="flex items-center gap-4">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-primary flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                    Live World Series
-                  </span>
-                  <span className="text-[10px] font-semibold text-on-surface-variant uppercase tracking-widest">
-                    Last Man Standing: <span className="text-on-surface font-bold">142 Runs</span>
+                <div className="flex items-center justify-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
+                    Road Trip Cricket • Spot Cars, Score Runs
                   </span>
                 </div>
               </div>
 
               <div className="text-center mb-16">
-                <h2 className="font-headline text-[5rem] md:text-[7rem] font-black leading-[0.85] tracking-tighter italic text-primary uppercase text-glow mb-2">
-                  CRICKET
+                <h2 className="font-headline text-[3.5rem] md:text-[5rem] font-black leading-[0.85] tracking-tighter italic text-primary uppercase text-glow mb-2">
+                  TARMAC<br/>TWENTY20
                 </h2>
                 <p className="font-body text-secondary font-extrabold tracking-[0.4em] text-sm uppercase">
                   The Asphalt League
@@ -265,7 +270,7 @@ export default function App() {
                     </div>
                     <div className="flex-1">
                       <label className={`block text-[10px] font-bold uppercase tracking-[0.1em] mb-1 ${i % 2 === 0 ? 'text-tertiary' : 'text-secondary'} opacity-80`}>
-                        {i === 0 ? 'Strike Player' : i === 1 ? 'Non-Striker' : 'Substitute'}
+                        {['Opener', 'No. 2', 'No. 3', 'Middle Order', 'Lower Order', 'Last Man'][i] ?? 'Substitute'}
                       </label>
                       <input 
                         className="w-full bg-transparent border-none p-0 text-lg font-headline font-bold text-on-surface focus:ring-0 placeholder:text-on-surface-variant/30"
@@ -391,7 +396,7 @@ export default function App() {
             <div className="w-full max-w-md z-10 flex flex-col items-center">
               <div className="mb-8 px-4 py-1.5 bg-surface-container-high rounded-full border border-outline-variant/15 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-secondary animate-pulse" />
-                <span className="font-body text-xs font-bold uppercase tracking-widest text-on-surface-variant">Inning {gameState.currentInning} • Road Warriors</span>
+                <span className="font-body text-xs font-bold uppercase tracking-widest text-on-surface-variant">Inning {gameState.currentInning} of {gameState.totalInnings}</span>
               </div>
 
               <div className="glass-panel w-full p-8 rounded-lg border border-outline-variant/10 text-center relative overflow-hidden mb-12">
@@ -407,7 +412,7 @@ export default function App() {
                     <div className="flex flex-col items-center">
                       <span className="text-[10px] uppercase font-bold text-on-surface-variant/60 tracking-widest">Rank</span>
                       <span className="font-headline text-xl font-bold">
-                        #{String([...gameState.players].sort((a, b) => b.runs - a.runs).findIndex(p => p.id === currentBatter.id) + 1).padStart(2, '0')}
+                        #{String([...gameState.players].sort((a, b) => (b.totalRuns + b.runs) - (a.totalRuns + a.runs)).findIndex(p => p.id === currentBatter.id) + 1).padStart(2, '0')}
                       </span>
                     </div>
                   </div>
@@ -422,11 +427,29 @@ export default function App() {
                   <span className="font-headline text-on-primary text-xl font-black uppercase tracking-tighter">START BAT</span>
                   <Play size={24} fill="currentColor" className="text-on-primary" />
                 </button>
-                <p className="font-body text-xs text-on-surface-variant/60 uppercase font-bold tracking-widest">Get ready for the first delivery</p>
+                <p className="font-body text-xs text-on-surface-variant/60 uppercase font-bold tracking-widest">
+                  {gameState.currentBatterIndex === 0 && gameState.currentInning === 1
+                    ? 'Get ready for the first delivery'
+                    : 'You\'re up next'}
+                </p>
               </div>
             </div>
             <div className="fixed bottom-28 w-full">
-              <Ticker items={['LATEST: ROHAN HITS 4 OFF A MOTORBIKE', 'POWERPLAY ACTIVE: 2X TRUCK POINTS', 'MILESTONE: 50 PARTNERSHIP REACHED']} />
+              <Ticker items={(() => {
+                const leader = [...gameState.players].sort((a, b) => (b.totalRuns + b.runs) - (a.totalRuns + a.runs))[0];
+                const items = [
+                  `INNING ${gameState.currentInning} OF ${gameState.totalInnings} • ${gameState.players.length} PLAYER${gameState.players.length > 1 ? 'S' : ''}`,
+                  `UP NEXT: ${currentBatter.name}`,
+                  `LEADER: ${leader.name} WITH ${leader.totalRuns + leader.runs} RUNS`,
+                ];
+                if (gameState.history.length > 0) {
+                  items.push(`LAST BALL: +${gameState.history[0]} RUN${gameState.history[0] !== 1 ? 'S' : ''}`);
+                }
+                if (currentBatter.totalRuns + currentBatter.runs > 0) {
+                  items.push(`${currentBatter.name} HAS ${currentBatter.totalRuns + currentBatter.runs} TOTAL RUNS`);
+                }
+                return items;
+              })()} />
             </div>
           </motion.main>
         )}
@@ -555,14 +578,18 @@ export default function App() {
             exit={{ opacity: 0 }}
             className="pt-24 px-6 max-w-2xl mx-auto pb-32"
           >
+            {(() => {
+              const ranked = [...gameState.players].sort((a, b) => (b.totalRuns + b.runs) - (a.totalRuns + a.runs));
+              const champion = ranked[0];
+              return (<>
             <div className="relative mb-12 text-center">
               <div className="text-secondary font-headline font-black italic uppercase tracking-widest text-sm mb-4">Champions Arena</div>
               <div className="relative mb-6 inline-block">
                 <div className="w-32 h-32 rounded-full p-1 bg-gradient-to-tr from-primary via-primary-container to-secondary">
                   <div className="w-full h-full rounded-full overflow-hidden bg-background">
-                    <img 
-                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${[...gameState.players].sort((a, b) => b.runs - a.runs)[0].name}`} 
-                      alt="Champion" 
+                    <img
+                      src={`https://api.dicebear.com/7.x/bottts/svg?seed=${champion.name}`}
+                      alt="Champion"
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -572,25 +599,23 @@ export default function App() {
                 </div>
               </div>
               <h2 className="font-headline font-black text-white text-5xl tracking-tighter uppercase mb-1">
-                {[...gameState.players].sort((a, b) => b.runs - a.runs)[0].name}
+                {champion.name}
               </h2>
               <div className="inline-flex items-center gap-2 bg-surface-container-highest px-4 py-1.5 rounded-full mb-8">
                 <Zap size={16} className="text-primary" />
                 <span className="font-headline font-bold text-primary tracking-tight">
-                  {[...gameState.players].sort((a, b) => b.runs - a.runs)[0].runs} RUNS
+                  {champion.totalRuns + champion.runs} RUNS
                 </span>
               </div>
             </div>
 
             <div className="space-y-4">
-              {[...gameState.players]
-                .sort((a, b) => b.runs - a.runs)
-                .map((player, i) => (
+              {ranked.map((player, i) => (
                   <div key={player.id} className={`flex items-center justify-between p-5 rounded-lg ${i === 0 ? 'bg-surface-container-highest border-2 border-primary/20' : 'bg-surface-container-high'}`}>
                     <div className="flex items-center gap-4">
                       <span className={`font-headline font-black text-2xl ${i === 0 ? 'text-primary' : 'text-on-surface-variant'}`}>{String(i + 1).padStart(2, '0')}</span>
                       <div className="w-12 h-12 rounded-full bg-surface-container-highest overflow-hidden border border-outline-variant/20">
-                        <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${player.name}`} alt={player.name} className="w-full h-full" />
+                        <img src={`https://api.dicebear.com/7.x/bottts/svg?seed=${player.name}`} alt={player.name} className="w-full h-full" />
                       </div>
                       <div>
                         <div className="font-headline font-bold text-lg leading-none mb-1 text-on-surface">{player.name}</div>
@@ -600,9 +625,9 @@ export default function App() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="font-headline font-black text-xl text-on-surface">{player.runs}</div>
+                      <div className="font-headline font-black text-xl text-on-surface">{player.totalRuns + player.runs}</div>
                       <div className="text-[10px] font-body font-bold text-secondary uppercase tracking-tighter">
-                        {(player.runs / (player.ballsFaced || 1)).toFixed(1)} RPB
+                        {((player.totalRuns + player.runs) / (player.totalBallsFaced + player.ballsFaced || 1)).toFixed(1)} RPB
                       </div>
                     </div>
                   </div>
@@ -618,6 +643,8 @@ export default function App() {
                 PLAY AGAIN
               </button>
             </div>
+            </>);
+            })()}
           </motion.main>
         )}
 
