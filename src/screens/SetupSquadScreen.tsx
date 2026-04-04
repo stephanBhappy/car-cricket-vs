@@ -57,7 +57,7 @@ export default function SetupSquadScreen({ gameState, onSetPlayerCount, onUpdate
               </div>
               <div className="flex-1">
                 <label className={`block text-[10px] font-bold uppercase tracking-[0.1em] mb-1 ${i % 2 === 0 ? 'text-tertiary' : 'text-secondary'} opacity-80`}>
-                  {['Opener', 'No. 2', 'No. 3', 'Middle Order', 'Lower Order', 'Last Man'][i] ?? 'Substitute'}
+                  {gameState.players.length === 1 ? 'Solo Mode' : (['Opener', 'No. 2', 'No. 3', 'Middle Order', 'Lower Order', 'Last Man'][i] ?? 'Substitute')}
                 </label>
                 <input
                   className="w-full bg-transparent border-none p-0 text-lg font-headline font-bold text-on-surface focus:ring-0 placeholder:text-on-surface-variant/30"

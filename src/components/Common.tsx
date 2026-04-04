@@ -1,18 +1,29 @@
-import React from 'react';
+import { useState } from 'react';
 
 export function Avatar({ name, className }: { name: string; className?: string }) {
+  const [loaded, setLoaded] = useState(false);
+  const [errored, setErrored] = useState(false);
   const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2);
+
   return (
     <div className={`relative w-full h-full ${className ?? ''}`}>
+      {/* Skeleton shown until image loads or errors */}
+      {!loaded && !errored && (
+        <div className="absolute inset-0 bg-surface-container-high animate-pulse" />
+      )}
+      {/* Initials fallback shown on error */}
+      {errored && (
+        <div className="absolute inset-0 flex items-center justify-center bg-surface-container-high text-primary font-headline font-black text-sm">
+          {initials}
+        </div>
+      )}
       <img
         src={`https://api.dicebear.com/7.x/bottts/svg?seed=${name || 'player'}`}
         alt={name}
-        className="w-full h-full object-cover"
-        onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement).style.display = 'flex'; }}
+        className={`w-full h-full object-cover transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+        onLoad={() => setLoaded(true)}
+        onError={() => setErrored(true)}
       />
-      <div className="absolute inset-0 items-center justify-center bg-surface-container-high text-primary font-headline font-black text-sm hidden">
-        {initials}
-      </div>
     </div>
   );
 }
