@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Play,
@@ -13,7 +13,7 @@ import {
   Users,
   Skull,
 } from 'lucide-react';
-import { Screen, Player, GameState, SCORING_RULES } from './types';
+import { Screen, GameState, SCORING_RULES } from './types';
 import { Ticker, BottomNav, IconMap } from './components/Common';
 
 export default function App() {
@@ -27,6 +27,35 @@ export default function App() {
   });
 
   const [showCustomInnings, setShowCustomInnings] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
+
+  useEffect(() => {
+    if (!showInfo) return;
+    const init = () => {
+      const w = window as any;
+      if (typeof w.BlinkPayButton !== 'undefined') {
+        w.BlinkPayButton.init({
+          username: 'barker',
+          containerId: 'blink-pay-button-container',
+          themeMode: 'dark',
+          language: 'en',
+          defaultAmount: 1000,
+          supportedCurrencies: [
+            { code: 'sats', name: 'sats', isCrypto: true },
+            { code: 'USD',  name: 'USD',  isCrypto: false },
+          ],
+          debug: false,
+        });
+      } else {
+        setTimeout(init, 100);
+      }
+    };
+    init();
+  }, [showInfo]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [screen]);
 
   const currentBatter = gameState.players[gameState.currentBatterIndex] ?? gameState.players[0];
 
@@ -153,10 +182,67 @@ export default function App() {
           </div>
         </div>
         <h1 className="font-headline tracking-tighter uppercase font-black text-2xl italic text-primary truncate max-w-[180px] sm:max-w-[300px]">
-          {screen === 'game' ? currentBatter?.name : 'TARMAC TWENTY20'}
+          {screen === 'game' ? currentBatter?.name : 'TARMAC20'}
         </h1>
-        <div className="w-10" />
+        <button onClick={() => setShowInfo(true)} className="p-2 hover:bg-surface-container-high rounded-full transition-colors">
+          <Info size={22} className="text-on-surface-variant" />
+        </button>
       </header>
+
+      {/* Info Modal */}
+      <AnimatePresence>
+        {showInfo && (
+          <motion.div
+            key="info-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-background/80 backdrop-blur-md flex items-end sm:items-center justify-center p-4"
+            onClick={() => setShowInfo(false)}
+          >
+            <motion.div
+              initial={{ y: 60, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 60, opacity: 0 }}
+              transition={{ type: 'spring', bounce: 0.2, duration: 0.5 }}
+              className="w-full max-w-md bg-surface-container-low rounded-2xl p-8 border border-outline-variant/20 shadow-2xl"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="font-headline font-black text-2xl uppercase tracking-tighter text-primary italic">About</h2>
+                <button onClick={() => setShowInfo(false)} className="p-2 hover:bg-surface-container-high rounded-full transition-colors">
+                  <ChevronLeft size={20} className="text-on-surface-variant rotate-[270deg]" />
+                </button>
+              </div>
+
+              <div className="space-y-5 text-on-surface-variant text-sm leading-relaxed">
+                <p>
+                  <span className="text-on-surface font-bold">Thanks for playing Tarmac20!</span> We hope you're having a great time on the road.
+                </p>
+                <p>
+                  This game started as a childhood car trip pastime — spotting cars and calling out runs. It's been played on long drives for years, and now it's received a modern upgrade to keep the tradition going.
+                </p>
+
+                <div className="bg-surface-container-high rounded-xl p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-tertiary mb-1">Feedback & Comments</p>
+                  <a
+                    href="mailto:tarmac20@proton.me"
+                    className="text-primary font-bold hover:underline"
+                  >
+                    tarmac20@proton.me
+                  </a>
+                </div>
+
+                <div className="bg-surface-container-high rounded-xl p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-tertiary mb-3">Support Us</p>
+                  <p className="text-xs mb-3">If you enjoy the game and would like to support its development, a Bitcoin donation is always appreciated.</p>
+                  <div id="blink-pay-button-container" />
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence mode="wait">
         {screen === 'home' && (
@@ -188,7 +274,7 @@ export default function App() {
 
               <div className="text-center mb-16">
                 <h2 className="font-headline text-[3.5rem] md:text-[5rem] font-black leading-[0.85] tracking-tighter italic text-primary uppercase text-glow mb-2">
-                  TARMAC<br/>TWENTY20
+                  TARMAC20
                 </h2>
                 <p className="font-body text-secondary font-extrabold tracking-[0.4em] text-sm uppercase">
                   The Asphalt League
