@@ -1,4 +1,22 @@
 import React from 'react';
+
+export function Avatar({ name, className }: { name: string; className?: string }) {
+  const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2);
+  return (
+    <div className={`relative w-full h-full ${className ?? ''}`}>
+      <img
+        src={`https://api.dicebear.com/7.x/bottts/svg?seed=${name || 'player'}`}
+        alt={name}
+        className="w-full h-full object-cover"
+        onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement).style.display = 'flex'; }}
+      />
+      <div className="absolute inset-0 items-center justify-center bg-surface-container-high text-primary font-headline font-black text-sm hidden">
+        {initials}
+      </div>
+    </div>
+  );
+}
+
 import { motion } from 'motion/react';
 import { 
   Trophy, 
