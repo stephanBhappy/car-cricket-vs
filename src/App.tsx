@@ -47,9 +47,12 @@ export default function App() {
   const [showInfo, setShowInfo] = useState(false);
   const [undoSnapshot, setUndoSnapshot] = useState<{ gameState: GameState; screen: Screen; label: string } | null>(null);
   const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const blinkInitialised = useRef(false);
+  const [showAbandonConfirm, setShowAbandonConfirm] = useState(false);
+  const abandonTarget = useRef<Screen | null>(null);
 
   useEffect(() => {
-    if (!showInfo) return;
+    if (!showInfo || blinkInitialised.current) return;
     const init = () => {
       const w = window as any;
       if (typeof w.BlinkPayButton !== 'undefined') {
@@ -65,6 +68,7 @@ export default function App() {
           ],
           debug: false,
         });
+        blinkInitialised.current = true;
       } else {
         setTimeout(init, 100);
       }
@@ -78,8 +82,15 @@ export default function App() {
 
   const currentBatter = gameState.players[gameState.currentBatterIndex] ?? gameState.players[0];
 
+  const activeGameScreens: Screen[] = ['game', 'out', 'next-batter'];
+
   const handleNavigate = (newScreen: Screen) => {
-    setScreen(newScreen);
+    if (activeGameScreens.includes(screen) && newScreen !== screen) {
+      abandonTarget.current = newScreen;
+      setShowAbandonConfirm(true);
+    } else {
+      setScreen(newScreen);
+    }
   };
 
   const parentScreen: Partial<Record<Screen, Screen>> = {
@@ -205,7 +216,7 @@ export default function App() {
       <header className="fixed top-0 w-full z-50 h-16 bg-background grid grid-cols-[1fr_auto_1fr] items-center px-6">
         <div className="flex items-center gap-3">
           {screen !== 'home' && (
-            <button onClick={() => setScreen(parentScreen[screen] ?? 'home')} className="p-2 hover:bg-surface-container-high rounded-full transition-colors">
+            <button aria-label="Go back" onClick={() => handleNavigate(parentScreen[screen] ?? 'home')} className="p-2 hover:bg-surface-container-high rounded-full transition-colors">
               <ChevronLeft size={24} className="text-primary" />
             </button>
           )}
@@ -217,7 +228,7 @@ export default function App() {
           {screen === 'game' ? currentBatter?.name : 'TARMAC20'}
         </h1>
         <div className="flex justify-end">
-          <button onClick={() => setShowInfo(true)} className="p-2 hover:bg-surface-container-high rounded-full transition-colors">
+          <button aria-label="About Tarmac20" onClick={() => setShowInfo(true)} className="p-2 hover:bg-surface-container-high rounded-full transition-colors">
             <Info size={22} className="text-on-surface-variant" />
           </button>
         </div>
@@ -279,6 +290,48 @@ export default function App() {
         )}
       </AnimatePresence>
 
+      {/* Abandon Game Confirmation */}
+      <AnimatePresence>
+        {showAbandonConfirm && (
+          <motion.div
+            key="abandon-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-background/80 backdrop-blur-md flex items-center justify-center p-6"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: 'spring', bounce: 0.2, duration: 0.4 }}
+              className="w-full max-w-sm bg-surface-container-low rounded-2xl p-8 border border-outline-variant/20 shadow-2xl text-center"
+            >
+              <p className="font-headline font-black text-2xl uppercase tracking-tighter text-on-surface mb-2">Abandon Game?</p>
+              <p className="text-on-surface-variant text-sm mb-8">Your current game progress will be lost.</p>
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={() => {
+                    setScreen(abandonTarget.current ?? 'home');
+                    setShowAbandonConfirm(false);
+                    abandonTarget.current = null;
+                  }}
+                  className="h-14 w-full bg-secondary/20 border border-secondary/30 text-secondary rounded-full font-headline font-black text-lg uppercase tracking-tighter active:scale-95 transition-all"
+                >
+                  Yes, Abandon
+                </button>
+                <button
+                  onClick={() => { setShowAbandonConfirm(false); abandonTarget.current = null; }}
+                  className="h-14 w-full bg-gradient-to-r from-primary to-primary-container text-on-primary rounded-full font-headline font-black text-lg uppercase tracking-tighter active:scale-95 transition-all"
+                >
+                  Keep Playing
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <AnimatePresence mode="wait">
         {screen === 'home' && (
           <motion.main 
@@ -289,9 +342,9 @@ export default function App() {
             className="relative min-h-screen flex flex-col items-center justify-center px-6 pb-32 pt-20"
           >
             <div className="fixed inset-0 z-0">
-              <img 
-                src="https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&q=80&w=1920" 
-                alt="Background" 
+              <img
+                src="/bg.jpg"
+                alt="Background"
                 className="w-full h-full object-cover opacity-20"
               />
               <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/80 to-background" />
@@ -476,6 +529,7 @@ export default function App() {
                     </div>
                     <div className="flex items-center gap-3">
                       <button
+                        aria-label="Decrease innings"
                         onClick={() => setGameState({ ...gameState, totalInnings: Math.max(4, gameState.totalInnings - 1) })}
                         className="w-10 h-10 rounded-md bg-surface-container-highest flex items-center justify-center text-on-surface active:scale-90"
                       >
@@ -483,6 +537,7 @@ export default function App() {
                       </button>
                       <span className="font-headline text-3xl font-black w-8 text-center">{gameState.totalInnings}</span>
                       <button
+                        aria-label="Increase innings"
                         onClick={() => setGameState({ ...gameState, totalInnings: gameState.totalInnings + 1 })}
                         className="w-10 h-10 rounded-md bg-surface-container-highest flex items-center justify-center text-on-surface active:scale-90"
                       >
@@ -679,7 +734,11 @@ export default function App() {
                   className="h-16 w-full bg-gradient-to-r from-primary to-primary-container rounded-full flex items-center justify-center gap-3 active:scale-95 transition-all shadow-lg"
                 >
                   <span className="font-headline font-black text-on-primary text-xl uppercase tracking-tighter">
-                    {(gameState.currentBatterIndex + 1 < gameState.players.length || gameState.currentInning < gameState.totalInnings) ? 'NEXT PLAYER' : 'VIEW RESULTS'}
+                    {gameState.currentBatterIndex + 1 < gameState.players.length
+                      ? 'NEXT PLAYER'
+                      : gameState.currentInning < gameState.totalInnings
+                        ? gameState.players.length === 1 ? 'NEXT INNING' : 'NEXT PLAYER'
+                        : 'VIEW RESULTS'}
                   </span>
                   <ArrowRight size={24} className="text-on-primary" />
                 </button>
@@ -748,7 +807,7 @@ export default function App() {
                       <div>
                         <div className="font-headline font-bold text-lg leading-none mb-1 text-on-surface">{player.name}</div>
                         <div className="text-[10px] font-body font-bold text-on-surface-variant uppercase tracking-widest">
-                          {i === 0 ? 'Master Blaster' : i === 1 ? 'Steady Anchor' : 'Power Hitter'}
+                          {['Master Blaster', 'Steady Anchor', 'Power Hitter', 'All-Rounder', 'Tail-Ender', 'Last Man'][i] ?? 'Power Hitter'}
                         </div>
                       </div>
                     </div>

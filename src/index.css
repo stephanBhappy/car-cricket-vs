@@ -30,6 +30,12 @@
   body {
     @apply bg-background text-on-surface font-body;
   }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
 }
 
 .text-glow {
