@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Play,
@@ -16,6 +16,23 @@ import {
 import { Screen, GameState, SCORING_RULES } from './types';
 import { Ticker, BottomNav, IconMap } from './components/Common';
 
+function Avatar({ name, className }: { name: string; className?: string }) {
+  const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2);
+  return (
+    <div className={`relative w-full h-full ${className ?? ''}`}>
+      <img
+        src={`https://api.dicebear.com/7.x/bottts/svg?seed=${name || 'player'}`}
+        alt={name}
+        className="w-full h-full object-cover"
+        onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement).style.display = 'flex'; }}
+      />
+      <div className="absolute inset-0 items-center justify-center bg-surface-container-high text-primary font-headline font-black text-sm hidden">
+        {initials}
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [screen, setScreen] = useState<Screen>('home');
   const [gameState, setGameState] = useState<GameState>({
@@ -28,6 +45,8 @@ export default function App() {
 
   const [showCustomInnings, setShowCustomInnings] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  const [undoSnapshot, setUndoSnapshot] = useState<{ gameState: GameState; screen: Screen; label: string } | null>(null);
+  const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!showInfo) return;
@@ -63,6 +82,17 @@ export default function App() {
     setScreen(newScreen);
   };
 
+  const parentScreen: Partial<Record<Screen, Screen>> = {
+    'setup-squad':    'home',
+    'setup-innings':  'setup-squad',
+    'next-batter':    'home',
+    'game':           'home',
+    'out':            'game',
+    'leaderboard':    'home',
+    'rules':          'home',
+    'rules-detail':   'rules',
+  };
+
   const updatePlayerName = (index: number, name: string) => {
     const newPlayers = [...gameState.players];
     newPlayers[index] = { ...newPlayers[index], name };
@@ -85,6 +115,11 @@ export default function App() {
   const handleScore = (ruleId: string) => {
     const rule = SCORING_RULES.find(r => r.id === ruleId);
     if (!rule) return;
+
+    const snapshot = { gameState, screen, label: rule.isOut ? 'OUT!' : `+${rule.runs} ${rule.label}` };
+    if (undoTimer.current) clearTimeout(undoTimer.current);
+    setUndoSnapshot(snapshot);
+    undoTimer.current = setTimeout(() => setUndoSnapshot(null), 4000);
 
     const newPlayers = [...gameState.players];
     const batter = { ...newPlayers[gameState.currentBatterIndex] };
@@ -160,33 +195,32 @@ export default function App() {
       currentInning: 1,
       history: []
     });
+    setShowCustomInnings(false);
     setScreen('home');
   };
 
   return (
     <div className="min-h-screen bg-background text-on-surface font-body overflow-x-hidden">
       {/* Top App Bar */}
-      <header className="fixed top-0 w-full z-50 h-16 bg-background flex items-center justify-between px-6">
+      <header className="fixed top-0 w-full z-50 h-16 bg-background grid grid-cols-[1fr_auto_1fr] items-center px-6">
         <div className="flex items-center gap-3">
           {screen !== 'home' && (
-            <button onClick={() => setScreen('home')} className="p-2 hover:bg-surface-container-high rounded-full transition-colors">
+            <button onClick={() => setScreen(parentScreen[screen] ?? 'home')} className="p-2 hover:bg-surface-container-high rounded-full transition-colors">
               <ChevronLeft size={24} className="text-primary" />
             </button>
           )}
           <div className="w-8 h-8 rounded-full bg-surface-container-high border border-primary/20 overflow-hidden">
-            <img 
-              src={`https://api.dicebear.com/7.x/bottts/svg?seed=${currentBatter?.name || 'player'}`} 
-              alt="Profile" 
-              className="w-full h-full object-cover"
-            />
+            <Avatar name={currentBatter?.name || 'player'} />
           </div>
         </div>
-        <h1 className="font-headline tracking-tighter uppercase font-black text-2xl italic text-primary truncate max-w-[180px] sm:max-w-[300px]">
+        <h1 className="font-headline tracking-tighter uppercase font-black text-2xl italic text-primary text-center">
           {screen === 'game' ? currentBatter?.name : 'TARMAC20'}
         </h1>
-        <button onClick={() => setShowInfo(true)} className="p-2 hover:bg-surface-container-high rounded-full transition-colors">
-          <Info size={22} className="text-on-surface-variant" />
-        </button>
+        <div className="flex justify-end">
+          <button onClick={() => setShowInfo(true)} className="p-2 hover:bg-surface-container-high rounded-full transition-colors">
+            <Info size={22} className="text-on-surface-variant" />
+          </button>
+        </div>
       </header>
 
       {/* Info Modal */}
@@ -227,6 +261,7 @@ export default function App() {
                   <p className="text-[10px] font-bold uppercase tracking-widest text-tertiary mb-1">Feedback & Comments</p>
                   <a
                     href="mailto:tarmac20@proton.me"
+                    rel="noopener noreferrer"
                     className="text-primary font-bold hover:underline"
                   >
                     tarmac20@proton.me
@@ -361,7 +396,7 @@ export default function App() {
                       <input 
                         className="w-full bg-transparent border-none p-0 text-lg font-headline font-bold text-on-surface focus:ring-0 placeholder:text-on-surface-variant/30"
                         value={player.name}
-                        onChange={(e) => updatePlayerName(i, e.target.value)}
+                        onChange={(e) => updatePlayerName(i, e.target.value.toUpperCase())}
                         placeholder="Enter name..."
                       />
                     </div>
@@ -558,7 +593,7 @@ export default function App() {
                 <div className="flex gap-8 mt-4">
                   <div className="flex flex-col items-center">
                     <span className="font-body text-[10px] text-on-surface-variant font-bold">STRIKE RATE</span>
-                    <span className="font-headline text-xl font-bold">{(currentBatter.runs / (currentBatter.ballsFaced || 1) * 100).toFixed(1)}</span>
+                    <span className="font-headline text-xl font-bold">{currentBatter.ballsFaced === 0 ? '—' : (currentBatter.runs / currentBatter.ballsFaced * 100).toFixed(1)}</span>
                   </div>
                   <div className="w-[1px] bg-outline-variant/30"></div>
                   <div className="flex flex-col items-center">
@@ -619,7 +654,10 @@ export default function App() {
                     </div>
                     <div className="text-right">
                       <p className="text-secondary font-headline font-black text-4xl">{currentBatter.runs}</p>
-                      <p className="text-on-surface-variant font-body text-[10px] uppercase">Runs Scored</p>
+                      <p className="text-on-surface-variant font-body text-[10px] uppercase">This Inning</p>
+                      {currentBatter.totalRuns > 0 && (
+                        <p className="text-primary font-headline font-bold text-sm">{currentBatter.totalRuns + currentBatter.runs} Total</p>
+                      )}
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4 mt-2">
@@ -645,11 +683,19 @@ export default function App() {
                   </span>
                   <ArrowRight size={24} className="text-on-primary" />
                 </button>
-                <button 
-                  onClick={() => setScreen('leaderboard')}
+                <button
+                  onClick={() => {
+                    const finalPlayers = gameState.players.map(p => ({
+                      ...p,
+                      totalRuns: p.totalRuns + p.runs,
+                      totalBallsFaced: p.totalBallsFaced + p.ballsFaced,
+                    }));
+                    setGameState({ ...gameState, players: finalPlayers });
+                    setScreen('leaderboard');
+                  }}
                   className="h-14 w-full bg-surface-container-highest/60 backdrop-blur-md rounded-full border border-outline-variant/30 flex items-center justify-center hover:bg-surface-container-highest transition-colors active:scale-95"
                 >
-                  <span className="font-body font-bold text-on-surface-variant text-sm uppercase tracking-widest">End Innings</span>
+                  <span className="font-body font-bold text-on-surface-variant text-sm uppercase tracking-widest">End Game</span>
                 </button>
               </div>
             </div>
@@ -673,11 +719,7 @@ export default function App() {
               <div className="relative mb-6 inline-block">
                 <div className="w-32 h-32 rounded-full p-1 bg-gradient-to-tr from-primary via-primary-container to-secondary">
                   <div className="w-full h-full rounded-full overflow-hidden bg-background">
-                    <img
-                      src={`https://api.dicebear.com/7.x/bottts/svg?seed=${champion.name}`}
-                      alt="Champion"
-                      className="w-full h-full object-cover"
-                    />
+                    <Avatar name={champion.name} />
                   </div>
                 </div>
                 <div className="absolute -bottom-2 -right-2 bg-secondary text-on-secondary w-10 h-10 rounded-full flex items-center justify-center shadow-lg border-4 border-background">
@@ -701,7 +743,7 @@ export default function App() {
                     <div className="flex items-center gap-4">
                       <span className={`font-headline font-black text-2xl ${i === 0 ? 'text-primary' : 'text-on-surface-variant'}`}>{String(i + 1).padStart(2, '0')}</span>
                       <div className="w-12 h-12 rounded-full bg-surface-container-highest overflow-hidden border border-outline-variant/20">
-                        <img src={`https://api.dicebear.com/7.x/bottts/svg?seed=${player.name}`} alt={player.name} className="w-full h-full" />
+                        <Avatar name={player.name} />
                       </div>
                       <div>
                         <div className="font-headline font-bold text-lg leading-none mb-1 text-on-surface">{player.name}</div>
@@ -895,6 +937,32 @@ export default function App() {
       </AnimatePresence>
 
       <BottomNav active={screen} onNavigate={handleNavigate} />
+
+      {/* Undo Toast */}
+      <AnimatePresence>
+        {undoSnapshot && (
+          <motion.div
+            key="undo-toast"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 20, opacity: 0 }}
+            className="fixed bottom-36 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-3 bg-surface-container-highest border border-outline-variant/30 rounded-full px-5 py-3 shadow-xl"
+          >
+            <span className="font-body text-sm font-bold text-on-surface">{undoSnapshot.label}</span>
+            <button
+              onClick={() => {
+                if (undoTimer.current) clearTimeout(undoTimer.current);
+                setGameState(undoSnapshot.gameState);
+                setScreen(undoSnapshot.screen);
+                setUndoSnapshot(null);
+              }}
+              className="font-headline font-black text-xs text-primary uppercase tracking-widest hover:text-primary/80 transition-colors"
+            >
+              Undo
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
