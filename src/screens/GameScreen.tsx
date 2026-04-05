@@ -45,16 +45,20 @@ export default function GameScreen({ gameState, currentBatter, onScore }: GameSc
             <button
               key={rule.id}
               onClick={() => onScore(rule.id)}
-              className={`${rule.id === 'truck' ? 'bg-primary' : rule.id === 'out' ? 'bg-secondary/10 border-2 border-secondary/30' : 'bg-surface-container-high'} rounded-lg p-6 h-48 flex flex-col justify-between items-center text-center active:scale-95 transition-all duration-200 group`}
+              className={`${rule.id === 'truck' ? 'bg-primary' : rule.id === 'out' ? 'bg-secondary/10 border-2 border-secondary/30' : 'bg-surface-container-high'} rounded-lg p-4 h-48 grid grid-rows-3 items-center text-center active:scale-95 transition-all duration-200 group`}
             >
-              <div className="flex flex-col items-center">
-                <Icon size={40} className={`${rule.id === 'truck' ? 'text-on-primary' : rule.color} mb-2`} />
+              <div className="flex flex-col items-center justify-center">
+                <Icon size={36} className={`${rule.id === 'truck' ? 'text-on-primary' : rule.color} mb-1`} />
                 <span className={`font-body text-[10px] font-bold tracking-wider uppercase ${rule.id === 'truck' ? 'text-on-primary-container' : rule.color}`}>{rule.label}</span>
               </div>
-              <span className={`font-headline text-4xl font-black ${rule.id === 'truck' ? 'text-on-primary' : rule.id === 'out' ? 'text-secondary' : 'text-on-background'}`}>
-                {rule.isOut ? 'OUT!' : `+${rule.runs}`}
-              </span>
-              <span className={`font-body text-[12px] font-bold ${rule.id === 'truck' ? 'text-on-primary-container' : 'text-tertiary'}`}>{rule.sublabel}</span>
+              <div className="flex items-center justify-center">
+                <span className={`font-headline text-4xl font-black ${rule.id === 'truck' ? 'text-on-primary' : rule.id === 'out' ? 'text-secondary' : 'text-on-background'}`}>
+                  {rule.isOut ? 'OUT!' : `+${rule.runs}`}
+                </span>
+              </div>
+              <div className="flex items-center justify-center">
+                <span className={`font-body text-[12px] font-bold ${rule.id === 'truck' ? 'text-on-primary-container' : 'text-tertiary'}`}>{rule.sublabel}</span>
+              </div>
             </button>
           );
         })}

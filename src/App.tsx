@@ -44,6 +44,7 @@ export default function App() {
   const [showAbandonConfirm, setShowAbandonConfirm] = useState(false);
   const abandonTarget = useRef<Screen | null>(null);
   const [showMidGameStats, setShowMidGameStats] = useState(false);
+  const blinkContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!showInfo) return;
@@ -52,12 +53,16 @@ export default function App() {
       if (attempts > 50) return; // give up after ~5 s
       const w = window as any;
       if (typeof w.BlinkPayButton !== 'undefined') {
+        const width = blinkContainerRef.current
+          ? Math.floor(blinkContainerRef.current.getBoundingClientRect().width)
+          : undefined;
         w.BlinkPayButton.init({
           username: 'barker',
           containerId: 'blink-pay-button-container',
           themeMode: 'dark',
           language: 'en',
           defaultAmount: 1000,
+          ...(width ? { width } : {}),
           supportedCurrencies: [
             { code: 'sats', name: 'sats', isCrypto: true },
             { code: 'USD',  name: 'USD',  isCrypto: false },
@@ -309,16 +314,16 @@ export default function App() {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 60, opacity: 0 }}
               transition={{ type: 'spring', bounce: 0.2, duration: 0.5 }}
-              className="w-full max-w-md bg-surface-container-low rounded-2xl p-8 border border-outline-variant/20 shadow-2xl"
+              className="w-full max-w-md bg-surface-container-low rounded-2xl border border-outline-variant/20 shadow-2xl flex flex-col max-h-[85vh]"
               onClick={e => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between px-8 pt-8 pb-4 shrink-0">
                 <h2 className="font-headline font-black text-2xl uppercase tracking-tighter text-primary italic">About</h2>
                 <button onClick={() => setShowInfo(false)} className="p-2 hover:bg-surface-container-high rounded-full transition-colors">
                   <ChevronLeft size={20} className="text-on-surface-variant rotate-[270deg]" />
                 </button>
               </div>
-              <div className="space-y-5 text-on-surface-variant text-sm leading-relaxed">
+              <div className="overflow-y-auto px-8 pb-8 space-y-5 text-on-surface-variant text-sm leading-relaxed">
                 <p>
                   <span className="text-on-surface font-bold">Thanks for playing Tarmac20!</span> We hope you're having a great time on the road.
                 </p>
@@ -338,7 +343,7 @@ export default function App() {
                 <div className="bg-surface-container-high rounded-xl p-4 overflow-hidden">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-tertiary mb-3">Support Us</p>
                   <p className="text-xs mb-3">If you enjoy the game and would like to support its development, a Bitcoin donation is always appreciated.</p>
-                  <div id="blink-pay-button-container" className="w-full max-w-full" />
+                  <div ref={blinkContainerRef} id="blink-pay-button-container" className="w-full max-w-full" />
                 </div>
               </div>
             </motion.div>

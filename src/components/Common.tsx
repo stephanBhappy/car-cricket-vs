@@ -104,7 +104,7 @@ export const BottomNav = ({ active, onNavigate }: { active: string, onNavigate: 
       className={`flex flex-col items-center justify-center px-5 py-2 transition-all duration-300 ${active === 'home' ? 'bg-primary text-background rounded-full' : 'text-tertiary'}`}
     >
       <Play size={24} fill={active === 'home' ? 'currentColor' : 'none'} />
-      <span className="font-body text-[10px] font-bold uppercase mt-1">Play</span>
+      <span className="font-body text-[10px] font-bold uppercase mt-1">Home</span>
     </button>
     <button 
       onClick={() => onNavigate('setup-squad')}
