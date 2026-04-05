@@ -51,12 +51,10 @@ export default function GameScreen({ gameState, currentBatter, onScore }: GameSc
                 <Icon size={40} className={`${rule.id === 'truck' ? 'text-on-primary' : rule.color} mb-2`} />
                 <span className={`font-body text-[10px] font-bold tracking-wider uppercase ${rule.id === 'truck' ? 'text-on-primary-container' : rule.color}`}>{rule.label}</span>
               </div>
-              <div className="w-full">
-                <span className={`block font-headline text-4xl font-black ${rule.id === 'truck' ? 'text-on-primary' : rule.id === 'out' ? 'text-secondary' : 'text-on-background'}`}>
-                  {rule.isOut ? 'OUT!' : `+${rule.runs}`}
-                </span>
-                <span className={`font-body text-[12px] font-bold ${rule.id === 'truck' ? 'text-on-primary-container' : 'text-tertiary'}`}>{rule.sublabel}</span>
-              </div>
+              <span className={`font-headline text-4xl font-black ${rule.id === 'truck' ? 'text-on-primary' : rule.id === 'out' ? 'text-secondary' : 'text-on-background'}`}>
+                {rule.isOut ? 'OUT!' : `+${rule.runs}`}
+              </span>
+              <span className={`font-body text-[12px] font-bold ${rule.id === 'truck' ? 'text-on-primary-container' : 'text-tertiary'}`}>{rule.sublabel}</span>
             </button>
           );
         })}

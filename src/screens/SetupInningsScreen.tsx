@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { Star, Minus, Plus, Play } from 'lucide-react';
-import { GameState, Screen } from '../types';
+import { GameState } from '../types';
 
 interface SetupInningsScreenProps {
   gameState: GameState;
@@ -8,7 +8,7 @@ interface SetupInningsScreenProps {
   onSelectPreset: (val: number) => void;
   onEnableCustom: () => void;
   onAdjustCustom: (delta: number) => void;
-  onNavigate: (screen: Screen) => void;
+  onStartGame: () => void;
 }
 
 export default function SetupInningsScreen({
@@ -17,7 +17,7 @@ export default function SetupInningsScreen({
   onSelectPreset,
   onEnableCustom,
   onAdjustCustom,
-  onNavigate,
+  onStartGame,
 }: SetupInningsScreenProps) {
   return (
     <motion.main
@@ -100,7 +100,7 @@ export default function SetupInningsScreen({
 
       <div className="mt-12 w-full max-w-md mx-auto">
         <button
-          onClick={() => onNavigate('next-batter')}
+          onClick={onStartGame}
           className="w-full h-16 rounded-full bg-gradient-to-r from-primary to-primary-container flex items-center justify-center gap-3 active:scale-95 transition-all shadow-[0_12px_40px_rgba(205,255,96,0.15)] group"
         >
           <span className="font-headline text-lg font-black text-on-primary uppercase tracking-tight">START GAME</span>

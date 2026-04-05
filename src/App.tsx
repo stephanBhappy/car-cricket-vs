@@ -200,10 +200,34 @@ export default function App() {
       totalBallsFaced: p.totalBallsFaced + p.ballsFaced,
     }));
     setGameState({ ...gameState, players: finalPlayers });
+    localStorage.removeItem(STORAGE_KEY);
     setScreen('leaderboard');
   };
 
-  const resetGame = () => {
+  // Resets all stats but keeps player names and count, then starts the game
+  const startGame = () => {
+    const freshPlayers = gameState.players.map(p => ({
+      ...p,
+      runs: 0,
+      totalRuns: 0,
+      ballsFaced: 0,
+      totalBallsFaced: 0,
+      isOut: false,
+      dismissalType: undefined,
+    }));
+    setGameState({
+      ...gameState,
+      players: freshPlayers,
+      currentBatterIndex: 0,
+      currentInning: 1,
+      history: [],
+    });
+    if (undoTimer.current) clearTimeout(undoTimer.current);
+    setUndoSnapshot(null);
+    setScreen('next-batter');
+  };
+
+  const clearGameStats = () => {
     const resetPlayers = gameState.players.map(p => ({
       ...p,
       runs: 0,
@@ -224,6 +248,10 @@ export default function App() {
     if (undoTimer.current) clearTimeout(undoTimer.current);
     setUndoSnapshot(null);
     localStorage.removeItem(STORAGE_KEY);
+  };
+
+  const resetGame = () => {
+    clearGameStats();
     setScreen('home');
   };
 
@@ -307,10 +335,10 @@ export default function App() {
                     tarmac20@proton.me
                   </a>
                 </div>
-                <div className="bg-surface-container-high rounded-xl p-4">
+                <div className="bg-surface-container-high rounded-xl p-4 overflow-hidden">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-tertiary mb-3">Support Us</p>
                   <p className="text-xs mb-3">If you enjoy the game and would like to support its development, a Bitcoin donation is always appreciated.</p>
-                  <div id="blink-pay-button-container" />
+                  <div id="blink-pay-button-container" className="w-full max-w-full" />
                 </div>
               </div>
             </motion.div>
@@ -340,9 +368,11 @@ export default function App() {
               <div className="flex flex-col gap-3">
                 <button
                   onClick={() => {
-                    setScreen(abandonTarget.current ?? 'home');
-                    setShowAbandonConfirm(false);
+                    const target = abandonTarget.current ?? 'home';
                     abandonTarget.current = null;
+                    setShowAbandonConfirm(false);
+                    clearGameStats();
+                    setScreen(target);
                   }}
                   className="h-14 w-full bg-secondary/20 border border-secondary/30 text-secondary rounded-full font-headline font-black text-lg uppercase tracking-tighter active:scale-95 transition-all"
                 >
@@ -363,7 +393,7 @@ export default function App() {
       <AnimatePresence mode="wait">
         {screen === 'home'          && <HomeScreen onNavigate={setScreen} />}
         {screen === 'setup-squad'   && <SetupSquadScreen gameState={gameState} onSetPlayerCount={setPlayerCount} onUpdatePlayerName={updatePlayerName} onNavigate={setScreen} />}
-        {screen === 'setup-innings' && <SetupInningsScreen gameState={gameState} showCustomInnings={showCustomInnings} onSelectPreset={handleSelectPreset} onEnableCustom={handleEnableCustom} onAdjustCustom={handleAdjustCustom} onNavigate={setScreen} />}
+        {screen === 'setup-innings' && <SetupInningsScreen gameState={gameState} showCustomInnings={showCustomInnings} onSelectPreset={handleSelectPreset} onEnableCustom={handleEnableCustom} onAdjustCustom={handleAdjustCustom} onStartGame={startGame} />}
         {screen === 'next-batter'   && <NextBatterScreen gameState={gameState} currentBatter={currentBatter} onNavigate={setScreen} />}
         {screen === 'game'          && <GameScreen gameState={gameState} currentBatter={currentBatter} onScore={handleScore} />}
         {screen === 'out'           && <OutScreen gameState={gameState} currentBatter={currentBatter} onNextPlayer={nextPlayer} onEndGame={endGame} />}
