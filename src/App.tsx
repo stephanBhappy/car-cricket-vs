@@ -333,11 +333,11 @@ export default function App() {
                 <div className="bg-surface-container-high rounded-xl p-4">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-tertiary mb-1">Feedback & Comments</p>
                   <a
-                    href="mailto:tarmac20@proton.me"
+                    href="mailto:info@tarmac20.com"
                     rel="noopener noreferrer"
                     className="text-primary font-bold hover:underline"
                   >
-                    tarmac20@proton.me
+                    info@tarmac20.com
                   </a>
                 </div>
                 <div className="bg-surface-container-high rounded-xl p-4 overflow-hidden">
