@@ -49,33 +49,41 @@ export default function App() {
 
   useEffect(() => {
     if (!showInfo) return;
-    let timer: ReturnType<typeof setTimeout>;
-    const init = (attempts = 0) => {
-      if (attempts > 50) return; // give up after ~5 s
-      const w = window as any;
-      if (typeof w.BlinkPayButton !== 'undefined') {
-        const width = blinkContainerRef.current
-          ? Math.floor(blinkContainerRef.current.getBoundingClientRect().width)
-          : undefined;
-        w.BlinkPayButton.init({
-          username: 'barker',
-          containerId: 'blink-pay-button-container',
-          themeMode: 'dark',
-          language: 'en',
-          defaultAmount: 1000,
-          ...(width ? { width } : {}),
-          supportedCurrencies: [
-            { code: 'sats', name: 'sats', isCrypto: true },
-            { code: 'USD',  name: 'USD',  isCrypto: false },
-          ],
-          debug: false,
-        });
-      } else {
-        timer = setTimeout(() => init(attempts + 1), 100);
-      }
+    const w = window as any;
+
+    const initBlink = () => {
+      const width = blinkContainerRef.current
+        ? Math.floor(blinkContainerRef.current.getBoundingClientRect().width)
+        : undefined;
+      w.BlinkPayButton.init({
+        username: 'barker',
+        containerId: 'blink-pay-button-container',
+        themeMode: 'dark',
+        language: 'en',
+        defaultAmount: 1000,
+        ...(width ? { width } : {}),
+        supportedCurrencies: [
+          { code: 'sats', name: 'sats', isCrypto: true },
+          { code: 'USD',  name: 'USD',  isCrypto: false },
+        ],
+        debug: false,
+      });
     };
-    init();
-    return () => clearTimeout(timer);
+
+    if (typeof w.BlinkPayButton !== 'undefined') {
+      initBlink();
+      return;
+    }
+
+    // Lazily inject the script the first time the modal opens
+    let script = document.getElementById('blink-script') as HTMLScriptElement | null;
+    if (!script) {
+      script = document.createElement('script');
+      script.id = 'blink-script';
+      script.src = 'https://blinkbitcoin.github.io/donation-button.blink.sv/js/blink-pay-button.js';
+      document.body.appendChild(script);
+    }
+    script.addEventListener('load', initBlink, { once: true });
   }, [showInfo]);
 
   useEffect(() => {

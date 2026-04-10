@@ -36,15 +36,17 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Tarmac20" />
     <link rel="preload" as="image" href="/bg.jpg" fetchpriority="high" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,100..900;1,100..900&family=Lexend:wght@100..900&display=swap" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,100..900;1,100..900&family=Lexend:wght@100..900&display=swap"></noscript>
+    <link rel="preload" as="font" href="/fonts/Epilogue-variable.woff2" type="font/woff2" crossorigin />
+    <link rel="preload" as="font" href="/fonts/Epilogue-italic-variable.woff2" type="font/woff2" crossorigin />
+    <link rel="preload" as="font" href="/fonts/Lexend-variable.woff2" type="font/woff2" crossorigin />
+    <!-- Preconnect to origins used on every load; dns-prefetch as fallback for older browsers -->
+    <link rel="preconnect" href="https://api.dicebear.com" />
+    <link rel="dns-prefetch" href="https://api.dicebear.com" />
+    <link rel="dns-prefetch" href="https://blinkbitcoin.github.io" />
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script defer src="https://blinkbitcoin.github.io/donation-button.blink.sv/js/blink-pay-button.js"></script>
   </body>
 </html>
 

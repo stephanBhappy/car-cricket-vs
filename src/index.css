@@ -1,5 +1,28 @@
 @import "tailwindcss";
 
+/* Self-hosted variable fonts — eliminates the Google Fonts external request chain */
+@font-face {
+  font-family: "Epilogue";
+  src: url("/fonts/Epilogue-variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Epilogue";
+  src: url("/fonts/Epilogue-italic-variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Lexend";
+  src: url("/fonts/Lexend-variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
   --color-primary: #cdff60;
   --color-primary-container: #b6f318;
