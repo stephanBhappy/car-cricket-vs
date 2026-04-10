@@ -14,11 +14,13 @@
 
     <!-- Open Graph (Facebook, WhatsApp, LinkedIn) -->
     <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:title" content="Tarmac20 - The Asphalt League" />
     <meta property="og:description" content="The road trip cricket game. Score runs by spotting cars, bikes, and trucks. Avoid the red car or you're out!" />
     <meta property="og:image" content="https://tarmac20.netlify.app/landscapeogimage.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Tarmac20 — the road trip cricket game" />
     <meta property="og:url" content="https://tarmac20.netlify.app" />
     <meta property="og:site_name" content="Tarmac20" />
 
@@ -26,7 +28,31 @@
     <meta name="twitter:title" content="Tarmac20 - The Asphalt League" />
     <meta name="twitter:description" content="The road trip cricket game. Score runs by spotting cars, bikes, and trucks. Avoid the red car or you're out!" />
     <meta name="twitter:image" content="https://tarmac20.netlify.app/landscapeogimage.png" />
+    <meta name="twitter:image:alt" content="Tarmac20 — the road trip cricket game" />
     <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- JSON-LD structured data — zero network cost, helps Google show rich results -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Tarmac20 - The Asphalt League",
+      "description": "The road trip cricket game. Score runs by spotting cars, bikes, and trucks. Avoid the red car or you're out!",
+      "url": "https://tarmac20.netlify.app",
+      "applicationCategory": "GameApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Tarmac20",
+        "email": "info@tarmac20.com"
+      }
+    }
+    </script>
 
     <!-- PWA / Mobile -->
     <link rel="icon" type="image/png" href="/favicon.png" />

@@ -62,6 +62,7 @@ export default function SetupSquadScreen({ gameState, onSetPlayerCount, onUpdate
                 <input
                   className="w-full bg-transparent border-none p-0 text-lg font-headline font-bold text-on-surface focus:ring-0 placeholder:text-on-surface-variant/30"
                   value={player.name}
+                  onFocus={(e) => e.target.select()}
                   onChange={(e) => onUpdatePlayerName(i, e.target.value.toUpperCase())}
                   placeholder="Enter name..."
                 />

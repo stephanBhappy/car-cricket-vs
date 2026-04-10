@@ -26,7 +26,7 @@ function loadSavedState(): { screen: Screen; gameState: GameState } | null {
 }
 
 const defaultGameState: GameState = {
-  players: [{ id: '1', name: 'PLAYER 1', runs: 0, totalRuns: 0, ballsFaced: 0, totalBallsFaced: 0, isOut: false }],
+  players: [{ id: '1', name: 'ENTER NAME', runs: 0, totalRuns: 0, ballsFaced: 0, totalBallsFaced: 0, isOut: false }],
   currentBatterIndex: 0,
   totalInnings: 2,
   currentInning: 1,
