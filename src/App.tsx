@@ -1,17 +1,18 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft, Info } from 'lucide-react';
 import { Screen, GameState, SCORING_RULES } from './types';
 import { Avatar, BottomNav } from './components/Common';
-import HomeScreen from './screens/HomeScreen';
-import SetupSquadScreen from './screens/SetupSquadScreen';
-import SetupInningsScreen from './screens/SetupInningsScreen';
-import NextBatterScreen from './screens/NextBatterScreen';
-import GameScreen from './screens/GameScreen';
-import OutScreen from './screens/OutScreen';
-import LeaderboardScreen from './screens/LeaderboardScreen';
-import RulesScreen from './screens/RulesScreen';
-import RulesDetailScreen from './screens/RulesDetailScreen';
+
+const HomeScreen = lazy(() => import('./screens/HomeScreen'));
+const SetupSquadScreen = lazy(() => import('./screens/SetupSquadScreen'));
+const SetupInningsScreen = lazy(() => import('./screens/SetupInningsScreen'));
+const NextBatterScreen = lazy(() => import('./screens/NextBatterScreen'));
+const GameScreen = lazy(() => import('./screens/GameScreen'));
+const OutScreen = lazy(() => import('./screens/OutScreen'));
+const LeaderboardScreen = lazy(() => import('./screens/LeaderboardScreen'));
+const RulesScreen = lazy(() => import('./screens/RulesScreen'));
+const RulesDetailScreen = lazy(() => import('./screens/RulesDetailScreen'));
 
 const STORAGE_KEY = 'tarmac20_state';
 
@@ -395,17 +396,19 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      <AnimatePresence mode="wait">
-        {screen === 'home'          && <HomeScreen onNavigate={setScreen} />}
-        {screen === 'setup-squad'   && <SetupSquadScreen gameState={gameState} onSetPlayerCount={setPlayerCount} onUpdatePlayerName={updatePlayerName} onNavigate={setScreen} />}
-        {screen === 'setup-innings' && <SetupInningsScreen gameState={gameState} showCustomInnings={showCustomInnings} onSelectPreset={handleSelectPreset} onEnableCustom={handleEnableCustom} onAdjustCustom={handleAdjustCustom} onStartGame={startGame} />}
-        {screen === 'next-batter'   && <NextBatterScreen gameState={gameState} currentBatter={currentBatter} onNavigate={setScreen} />}
-        {screen === 'game'          && <GameScreen gameState={gameState} currentBatter={currentBatter} onScore={handleScore} />}
-        {screen === 'out'           && <OutScreen gameState={gameState} currentBatter={currentBatter} onNextPlayer={nextPlayer} onEndGame={endGame} />}
-        {screen === 'leaderboard'   && <LeaderboardScreen gameState={gameState} onPlayAgain={resetGame} />}
-        {screen === 'rules'         && <RulesScreen onNavigate={setScreen} />}
-        {screen === 'rules-detail'  && <RulesDetailScreen onNavigate={setScreen} />}
-      </AnimatePresence>
+      <Suspense fallback={null}>
+        <AnimatePresence mode="wait">
+          {screen === 'home'          && <HomeScreen onNavigate={setScreen} />}
+          {screen === 'setup-squad'   && <SetupSquadScreen gameState={gameState} onSetPlayerCount={setPlayerCount} onUpdatePlayerName={updatePlayerName} onNavigate={setScreen} />}
+          {screen === 'setup-innings' && <SetupInningsScreen gameState={gameState} showCustomInnings={showCustomInnings} onSelectPreset={handleSelectPreset} onEnableCustom={handleEnableCustom} onAdjustCustom={handleAdjustCustom} onStartGame={startGame} />}
+          {screen === 'next-batter'   && <NextBatterScreen gameState={gameState} currentBatter={currentBatter} onNavigate={setScreen} />}
+          {screen === 'game'          && <GameScreen gameState={gameState} currentBatter={currentBatter} onScore={handleScore} />}
+          {screen === 'out'           && <OutScreen gameState={gameState} currentBatter={currentBatter} onNextPlayer={nextPlayer} onEndGame={endGame} />}
+          {screen === 'leaderboard'   && <LeaderboardScreen gameState={gameState} onPlayAgain={resetGame} />}
+          {screen === 'rules'         && <RulesScreen onNavigate={setScreen} />}
+          {screen === 'rules-detail'  && <RulesDetailScreen onNavigate={setScreen} />}
+        </AnimatePresence>
+      </Suspense>
 
       <BottomNav active={screen} onNavigate={handleNavigate} />
 

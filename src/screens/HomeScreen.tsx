@@ -19,6 +19,7 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
         <img
           src="/bg.jpg"
           alt="Background"
+          fetchPriority="high"
           className="w-full h-full object-cover opacity-20"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/80 to-background" />
