@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { Info, Skull, ChevronLeft } from 'lucide-react';
-import { IconMap } from '../components/Common';
+import { IconMap } from '../components/IconMap';
 import { SCORING_RULES, Screen } from '../types';
 
 interface RulesScreenProps {

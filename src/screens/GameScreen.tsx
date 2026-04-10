@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { IconMap } from '../components/Common';
+import { IconMap } from '../components/IconMap';
 import { GameState, Player, SCORING_RULES } from '../types';
 
 interface GameScreenProps {

@@ -1,6 +1,23 @@
 import { motion } from 'motion/react';
 import { Play } from 'lucide-react';
-import { Ticker } from '../components/Common';
+const Ticker = ({ items }: { items: string[] }) => (
+  <div className="w-full overflow-hidden bg-surface-container-lowest/40 backdrop-blur-md py-2 border-y border-outline-variant/5">
+    <div className="flex whitespace-nowrap gap-12 animate-marquee">
+      {items.map((item, i) => (
+        <div key={i} className="flex items-center gap-3">
+          <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+          <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">{item}</span>
+        </div>
+      ))}
+      {items.map((item, i) => (
+        <div key={`dup-${i}`} className="flex items-center gap-3">
+          <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+          <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">{item}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+);
 import { GameState, Player, Screen } from '../types';
 
 interface NextBatterScreenProps {
