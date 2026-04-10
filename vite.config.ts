@@ -10,8 +10,20 @@ export default defineConfig(({mode}) => {
     plugins: [
       react(),
       tailwindcss(),
+      // Convert Vite's blocking <link rel="stylesheet"> to non-blocking after build
+      {
+        name: 'defer-css',
+        enforce: 'post' as const,
+        transformIndexHtml(html: string) {
+          return html.replace(
+            /<link rel="stylesheet" crossorigin href="(\/assets\/[^"]+\.css)">/g,
+            '<link rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'" href="$1">',
+          );
+        },
+      },
       VitePWA({
         registerType: 'autoUpdate',
+        injectRegister: 'script-defer',
         includeAssets: ['favicon.png', 'icon-192.png', 'icon-512.png', 'icon-512-maskable.png'],
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],

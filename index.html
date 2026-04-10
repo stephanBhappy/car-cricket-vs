@@ -61,6 +61,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Tarmac20" />
+    <!-- Critical: sets background before the deferred CSS bundle loads, preventing a white flash -->
+    <style>html,body{background:#0c0c1f;color:#e5e3ff}</style>
     <link rel="preload" as="image" href="/bg.jpg" fetchpriority="high" />
     <link rel="preload" as="font" href="/fonts/Epilogue-variable.woff2" type="font/woff2" crossorigin />
     <link rel="preload" as="font" href="/fonts/Epilogue-italic-variable.woff2" type="font/woff2" crossorigin />

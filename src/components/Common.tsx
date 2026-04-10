@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Trophy, Users, BookOpen, Play } from 'lucide-react';
+import { Trophy, Users, BookOpen, Home } from 'lucide-react';
 
 export function Avatar({ name, className }: { name: string; className?: string }) {
   const [loaded, setLoaded] = useState(false);
@@ -33,7 +33,7 @@ export const BottomNav = ({ active, onNavigate }: { active: string, onNavigate: 
       onClick={() => onNavigate('home')}
       className={`flex flex-col items-center justify-center px-5 py-2 transition-all duration-300 ${active === 'home' ? 'bg-primary text-background rounded-full' : 'text-tertiary'}`}
     >
-      <Play size={24} fill={active === 'home' ? 'currentColor' : 'none'} />
+      <Home size={24} fill={active === 'home' ? 'currentColor' : 'none'} />
       <span className="font-body text-[10px] font-bold uppercase mt-1">Home</span>
     </button>
     <button
