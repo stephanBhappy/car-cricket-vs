@@ -19,6 +19,13 @@
   [headers.values]
     Cache-Control = "no-cache"
 
+# Serve assetlinks.json as a static file (must come before the SPA catch-all)
+[[redirects]]
+  from = "/.well-known/assetlinks.json"
+  to = "/.well-known/assetlinks.json"
+  status = 200
+  force = true
+
 # SPA rewrite: serve index.html for all routes without an HTTP redirect round-trip
 [[redirects]]
   from = "/*"
