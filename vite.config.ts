@@ -48,6 +48,34 @@ export default defineConfig(({mode}) => {
               form_factor: 'wide',
               label: 'Tarmac20 game screen',
             },
+            {
+              src: '/screenshot-1.png',
+              sizes: '1080x2100',
+              type: 'image/png',
+              form_factor: 'narrow',
+              label: 'Tarmac20 home screen',
+            },
+            {
+              src: '/screenshot-2.png',
+              sizes: '1080x2100',
+              type: 'image/png',
+              form_factor: 'narrow',
+              label: 'Tarmac20 game screen',
+            },
+            {
+              src: '/screenshot-3.png',
+              sizes: '1080x2100',
+              type: 'image/png',
+              form_factor: 'narrow',
+              label: 'Tarmac20 scoring screen',
+            },
+            {
+              src: '/screenshot-4.png',
+              sizes: '1080x2100',
+              type: 'image/png',
+              form_factor: 'narrow',
+              label: 'Tarmac20 leaderboard',
+            },
           ],
           icons: [
             {
