@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.tarmac20.app",
+    "sha256_cert_fingerprints": ["44:B2:87:5E:64:74:22:4D:31:57:08:03:09:CB:1C:5E:EE:1A:DB:65:F5:49:EF:C6:52:F0:80:79:4E:E0:D0:9F"]
+  }
+}]
