@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, Info } from 'lucide-react';
+import { ChevronLeft, Info, Maximize2, Minimize2, X } from 'lucide-react';
 import { Screen, GameState, SCORING_RULES } from './types';
 import { Avatar, BottomNav } from './components/Common';
 
@@ -45,49 +45,10 @@ export default function App() {
   const [showAbandonConfirm, setShowAbandonConfirm] = useState(false);
   const abandonTarget = useRef<Screen | null>(null);
   const [showMidGameStats, setShowMidGameStats] = useState(false);
-  const blinkContainerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!showInfo) return;
-    const w = window as any;
-
-    const initBlink = () => {
-      const width = blinkContainerRef.current
-        ? Math.floor(blinkContainerRef.current.getBoundingClientRect().width)
-        : undefined;
-      w.BlinkPayButton.init({
-        username: 'barker',
-        containerId: 'blink-pay-button-container',
-        themeMode: 'dark',
-        language: 'en',
-        defaultAmount: 1000,
-        ...(width ? { width } : {}),
-        supportedCurrencies: [
-          { code: 'sats', name: 'sats', isCrypto: true },
-          { code: 'USD',  name: 'USD',  isCrypto: false },
-        ],
-        debug: false,
-      });
-    };
-
-    if (typeof w.BlinkPayButton !== 'undefined') {
-      initBlink();
-      return;
-    }
-
-    // Lazily inject the script the first time the modal opens
-    let script = document.getElementById('blink-script') as HTMLScriptElement | null;
-    if (!script) {
-      script = document.createElement('script');
-      script.id = 'blink-script';
-      script.src = 'https://blinkbitcoin.github.io/donation-button.blink.sv/js/blink-pay-button.js';
-      document.body.appendChild(script);
-    }
-    script.addEventListener('load', initBlink, { once: true });
-  }, [showInfo]);
-
+  const [focusMode, setFocusMode] = useState(false);
   useEffect(() => {
     window.scrollTo(0, 0);
+    if (screen !== 'game') setFocusMode(false);
   }, [screen]);
 
   useEffect(() => {
@@ -301,9 +262,19 @@ export default function App() {
           {screen === 'game' ? currentBatter?.name : 'TARMAC20'}
         </h1>
         <div className="flex justify-end">
-          <button aria-label="About Tarmac20" onClick={() => setShowInfo(true)} className="p-2 hover:bg-surface-container-high rounded-full transition-colors">
-            <Info size={22} className="text-on-surface-variant" />
-          </button>
+          {screen === 'game' ? (
+            <button
+              aria-label={focusMode ? 'Exit focus mode' : 'Enter focus mode'}
+              onClick={() => setFocusMode(f => !f)}
+              className={`p-2 rounded-full transition-colors ${focusMode ? 'bg-primary text-on-primary' : 'hover:bg-surface-container-high text-on-surface-variant'}`}
+            >
+              {focusMode ? <Minimize2 size={22} /> : <Maximize2 size={22} />}
+            </button>
+          ) : (
+            <button aria-label="About Tarmac20" onClick={() => setShowInfo(true)} className="p-2 hover:bg-surface-container-high rounded-full transition-colors">
+              <Info size={22} className="text-on-surface-variant" />
+            </button>
+          )}
         </div>
       </header>
 
@@ -329,7 +300,7 @@ export default function App() {
               <div className="flex items-center justify-between px-8 pt-8 pb-4 shrink-0">
                 <h2 className="font-headline font-black text-2xl uppercase tracking-tighter text-primary italic">About</h2>
                 <button onClick={() => setShowInfo(false)} className="p-2 hover:bg-surface-container-high rounded-full transition-colors">
-                  <ChevronLeft size={20} className="text-on-surface-variant rotate-[270deg]" />
+                  <X size={20} className="text-on-surface-variant" />
                 </button>
               </div>
               <div className="overflow-y-auto px-8 pb-8 space-y-5 text-on-surface-variant text-sm leading-relaxed">
@@ -352,7 +323,14 @@ export default function App() {
                 <div className="bg-surface-container-high rounded-xl p-4 overflow-hidden">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-tertiary mb-3">Support Us</p>
                   <p className="text-xs mb-3">If you enjoy the game and would like to support its development, a Bitcoin donation is always appreciated.</p>
-                  <div ref={blinkContainerRef} id="blink-pay-button-container" className="w-full max-w-full" />
+                  <a
+                    href="https://pay.blink.sv/barker"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-[#F7931A] hover:bg-[#F7931A]/90 active:scale-95 text-white font-bold rounded-xl transition-all text-sm"
+                  >
+                    ⚡ Donate Bitcoin
+                  </a>
                 </div>
               </div>
             </motion.div>
@@ -410,7 +388,7 @@ export default function App() {
           {screen === 'setup-squad'   && <SetupSquadScreen gameState={gameState} onSetPlayerCount={setPlayerCount} onUpdatePlayerName={updatePlayerName} onNavigate={setScreen} />}
           {screen === 'setup-innings' && <SetupInningsScreen gameState={gameState} showCustomInnings={showCustomInnings} onSelectPreset={handleSelectPreset} onEnableCustom={handleEnableCustom} onAdjustCustom={handleAdjustCustom} onStartGame={startGame} />}
           {screen === 'next-batter'   && <NextBatterScreen gameState={gameState} currentBatter={currentBatter} onNavigate={setScreen} />}
-          {screen === 'game'          && <GameScreen gameState={gameState} currentBatter={currentBatter} onScore={handleScore} />}
+          {screen === 'game'          && <GameScreen gameState={gameState} currentBatter={currentBatter} onScore={handleScore} focusMode={focusMode} />}
           {screen === 'out'           && <OutScreen gameState={gameState} currentBatter={currentBatter} onNextPlayer={nextPlayer} onEndGame={endGame} />}
           {screen === 'leaderboard'   && <LeaderboardScreen gameState={gameState} onPlayAgain={resetGame} />}
           {screen === 'rules'         && <RulesScreen onNavigate={setScreen} />}
@@ -418,7 +396,7 @@ export default function App() {
         </AnimatePresence>
       </Suspense>
 
-      <BottomNav active={screen} onNavigate={handleNavigate} />
+      {!(screen === 'game' && focusMode) && <BottomNav active={screen} onNavigate={handleNavigate} />}
 
       {/* Mid-Game Stats Modal */}
       <AnimatePresence>
@@ -453,7 +431,7 @@ export default function App() {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 20, opacity: 0 }}
-            className="fixed bottom-36 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-3 bg-surface-container-highest border border-outline-variant/30 rounded-full px-5 py-3 shadow-xl"
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-3 bg-surface-container-highest border border-outline-variant/30 rounded-full px-5 py-3 shadow-xl"
           >
             <span className="font-body text-sm font-bold text-on-surface">{undoSnapshot.label}</span>
             <button
