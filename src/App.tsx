@@ -48,7 +48,7 @@ export default function App() {
   const [focusMode, setFocusMode] = useState(true);
   useEffect(() => {
     window.scrollTo(0, 0);
-    if (screen !== 'game') setFocusMode(false);
+    if (screen !== 'game') setFocusMode(true);
   }, [screen]);
 
   useEffect(() => {
