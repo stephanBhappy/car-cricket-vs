@@ -45,7 +45,7 @@ export default function App() {
   const [showAbandonConfirm, setShowAbandonConfirm] = useState(false);
   const abandonTarget = useRef<Screen | null>(null);
   const [showMidGameStats, setShowMidGameStats] = useState(false);
-  const [focusMode, setFocusMode] = useState(false);
+  const [focusMode, setFocusMode] = useState(true);
   useEffect(() => {
     window.scrollTo(0, 0);
     if (screen !== 'game') setFocusMode(false);
