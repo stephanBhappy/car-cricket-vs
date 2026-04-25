@@ -396,7 +396,7 @@ export default function App() {
         </AnimatePresence>
       </Suspense>
 
-      {!(screen === 'game' && focusMode) && <BottomNav active={screen} onNavigate={handleNavigate} />}
+      {!(screen === 'game' && focusMode) && screen !== 'setup-squad' && screen !== 'setup-innings' && <BottomNav active={screen} onNavigate={handleNavigate} />}
 
       {/* Mid-Game Stats Modal */}
       <AnimatePresence>
