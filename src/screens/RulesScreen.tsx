@@ -27,6 +27,16 @@ export default function RulesScreen({ onNavigate }: RulesScreenProps) {
         </p>
       </section>
 
+      <section className="mb-12">
+        <h3 className="text-4xl md:text-5xl font-headline font-black text-on-background uppercase leading-[0.9] tracking-tighter mb-4">
+          HOW TO <br />
+          <span className="text-primary">PLAY</span>
+        </h3>
+        <p className="text-on-surface-variant max-w-md text-lg leading-relaxed">
+          Players take turns at 'bat', and they score runs based on oncoming traffic. For vehicles to count, they must be moving and traveling in the opposite direction.
+        </p>
+      </section>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
         <div className="bg-surface-container-low rounded-lg p-6 border-t-4 border-primary">
           <h3 className="text-primary font-headline font-extrabold text-2xl mb-6 flex items-center gap-2">
@@ -36,15 +46,18 @@ export default function RulesScreen({ onNavigate }: RulesScreenProps) {
             {SCORING_RULES.filter(r => !r.isOut).map(rule => {
               const Icon = IconMap[rule.icon as keyof typeof IconMap];
               return (
-                <div key={rule.id} className="flex items-center justify-between p-4 bg-surface-container-high rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <Icon size={24} className={rule.color} />
-                    <div>
-                      <p className="font-bold">{rule.label}</p>
-                      <p className="text-xs text-on-surface-variant">{rule.sublabel}</p>
+                <div key={rule.id} className="flex flex-col p-4 bg-surface-container-high rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Icon size={24} className={rule.color} />
+                      <div>
+                        <p className="font-bold">{rule.label}</p>
+                        <p className="text-xs text-on-surface-variant">{rule.sublabel}</p>
+                      </div>
                     </div>
+                    <div className="text-2xl font-headline font-black text-primary">{rule.runs} RUN{rule.runs > 1 ? 'S' : ''}</div>
                   </div>
-                  <div className="text-2xl font-headline font-black text-primary">{rule.runs} RUN{rule.runs > 1 ? 'S' : ''}</div>
+                  {(rule as any).description && <p className="text-xs text-on-surface-variant mt-2">{(rule as any).description}</p>}
                 </div>
               );
             })}
@@ -64,13 +77,22 @@ export default function RulesScreen({ onNavigate }: RulesScreenProps) {
         </div>
       </div>
 
-      <div className="flex justify-center mb-8">
-        <button
-          onClick={() => onNavigate('rules-detail')}
-          className="text-on-surface-variant text-lg leading-relaxed underline hover:text-primary transition-colors"
-        >
-          More information
-        </button>
+      <div className="space-y-4 mb-12">
+        <p className="text-on-surface-variant text-lg leading-relaxed">
+          Once everyone has had a turn at bat, the player with the highest score wins.
+        </p>
+        <div className="p-6 bg-surface-container-high rounded-xl border-l-4 border-secondary/50">
+          <p className="text-sm font-bold text-on-surface uppercase tracking-widest mb-2">Pro Tip</p>
+          <p className="italic text-on-surface-variant">
+            Note: This game works well on open roads for long road trips, not so well with city driving.
+          </p>
+        </div>
+        <div className="p-6 bg-primary/10 rounded-xl border border-primary/20">
+          <p className="text-sm font-bold text-primary uppercase tracking-widest mb-2">Optional Extra</p>
+          <p className="text-on-surface-variant">
+            <strong className="text-on-surface">Emergency Vehicles:</strong> An ambulance or fire truck with lights on could be a "Free Hit" (doubles the next vehicle).
+          </p>
+        </div>
       </div>
 
       <div className="flex justify-center mt-4">

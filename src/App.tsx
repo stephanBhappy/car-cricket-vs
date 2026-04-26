@@ -12,7 +12,6 @@ const GameScreen = lazy(() => import('./screens/GameScreen'));
 const OutScreen = lazy(() => import('./screens/OutScreen'));
 const LeaderboardScreen = lazy(() => import('./screens/LeaderboardScreen'));
 const RulesScreen = lazy(() => import('./screens/RulesScreen'));
-const RulesDetailScreen = lazy(() => import('./screens/RulesDetailScreen'));
 
 const STORAGE_KEY = 'tarmac20_state';
 
@@ -84,7 +83,6 @@ export default function App() {
     'out':           'game',
     'leaderboard':   'home',
     'rules':         'home',
-    'rules-detail':  'rules',
   };
 
   const updatePlayerName = (index: number, name: string) => {
@@ -392,7 +390,6 @@ export default function App() {
           {screen === 'out'           && <OutScreen gameState={gameState} currentBatter={currentBatter} onNextPlayer={nextPlayer} onEndGame={endGame} />}
           {screen === 'leaderboard'   && <LeaderboardScreen gameState={gameState} onPlayAgain={resetGame} />}
           {screen === 'rules'         && <RulesScreen onNavigate={setScreen} />}
-          {screen === 'rules-detail'  && <RulesDetailScreen onNavigate={setScreen} />}
         </AnimatePresence>
       </Suspense>
 
