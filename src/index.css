@@ -49,6 +49,14 @@
   --font-body: "Lexend", sans-serif;
 }
 
+/* Scale up the entire UI on tablets and larger screens */
+@media (min-width: 768px) {
+  html { font-size: 20px; }
+}
+@media (min-width: 1024px) {
+  html { font-size: 24px; }
+}
+
 @layer base {
   body {
     @apply bg-background text-on-surface font-body;
