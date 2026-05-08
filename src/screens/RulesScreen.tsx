@@ -32,9 +32,14 @@ export default function RulesScreen({ onNavigate }: RulesScreenProps) {
           HOW TO <br />
           <span className="text-primary">PLAY</span>
         </h3>
-        <p className="text-on-surface-variant max-w-md text-lg leading-relaxed">
-          Players take turns at 'bat', and they score runs based on oncoming traffic. For vehicles to count, they must be moving and traveling in the opposite direction.
-        </p>
+        <div className="space-y-4 max-w-md text-lg leading-relaxed text-on-surface-variant">
+          <p>
+            Tarmac20 is designed to be played on a road trip — by a passenger, not the driver! As vehicles pass in the opposite direction, the designated scorer taps the matching button in the app to record the run.
+          </p>
+          <p>
+            Players take turns at 'bat', scoring runs based on the colour of oncoming traffic. Only vehicles that are moving and travelling in the opposite direction count.
+          </p>
+        </div>
       </section>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
